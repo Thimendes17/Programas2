@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro - Familia Amorim Mendes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .month-selector {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .month-selector select {
+            padding: 12px 20px;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .month-selector select:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .receitas::before {
+            background: linear-gradient(45deg, #4caf50, #45a049);
+        }
+
+        .despesas::before {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+        }
+
+        .pendentes::before {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+        }
+
+        .summary-card h3 {
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .valor {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .receitas .valor {
+            color: #4caf50;
+        }
+
+        .despesas .valor {
+            color: #f44336;
+        }
+
+        .pendentes .valor {
+            color: #ff9800;
+        }
+
+        .saldo .valor {
+            color: #667eea;
+        }
+
+        .forms-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-card h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group input[type="date"] {
+            appearance: none;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #667eea;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .transactions {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .transactions h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: transparent;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .transaction-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .transaction-item.pago {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(76, 175, 80, 0.1));
+            border-color: #4caf50;
+        }
+
+        .transaction-item.pendente {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.05), rgba(255, 152, 0, 0.1));
+            border-color: #ff9800;
+        }
+
+        .transaction-info {
+            flex: 1;
+        }
+
+        .transaction-desc {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .transaction-details {
+            display: flex;
+            gap: 15px;
+            color: #666;
+            font-size: 0.9em;
+            flex-wrap: wrap;
+        }
+
+        .transaction-value {
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-right: 15px;
+        }
+
+        .transaction-value.receita {
+            color: #4caf50;
+        }
+
+        .transaction-value.despesa {
+            color: #f44336;
+        }
+
+        .transaction-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .status-toggle {
+            background: none;
+            border: 2px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .status-toggle.pago {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .status-toggle.pendente {
+            background: #ff9800;
+            color: white;
+            border-color: #ff9800;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #888;
+            padding: 40px;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-indicator.pago {
+            background: #4caf50;
+        }
+
+        .status-indicator.pendente {
+            background: #ff9800;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .forms-section {
+                grid-template-columns: 1fr;
+            }
+
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .transaction-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .transaction-actions {
+                align-self: flex-end;
+            }
+
+            .filter-tabs {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Controle Financeiro - Familia Amorim Mendes</h1>
+        </div>
+
+        <div class="month-selector">
+            <select id="monthSelect">
+                <option value="0">Janeiro</option>
+                <option value="1">Fevereiro</option>
+                <option value="2">Março</option>
+                <option value="3">Abril</option>
+                <option value="4">Maio</option>
+                <option value="5">Junho</option>
+                <option value="6">Julho</option>
+                <option value="7">Agosto</option>
+                <option value="8">Setembro</option>
+                <option value="9">Outubro</option>
+                <option value="10">Novembro</option>
+                <option value="11">Dezembro</option>
+            </select>
+        </div>
+
+        <div class="summary">
+            <div class="summary-card receitas">
+                <h3>Receitas Pagas</h3>
+                <div class="valor" id="totalReceitasPagas">R$ 0,00</div>
+            </div>
+            <div class="summary-card despesas">
+                <h3>Despesas Pagas</h3>
+                <div class="valor" id="totalDespesasPagas">R$ 0,00</div>
+            </div>
+            <div class="summary-card pendentes">
+                <h3>Valores Pendentes</h3>
+                <div class="valor" id="totalPendentes">R$ 0,00</div>
+            </div>
+            <div class="summary-card saldo">
+                <h3>Saldo Real</h3>
+                <div class="valor" id="saldoReal">R$ 0,00</div>
+            </div>
+            <div class="summary-card saldo">
+                <h3>Saldo Previsto</h3>
+                <div class="valor" id="saldoPrevisto">R$ 0,00</div>
+            </div>
+        </div>
+
+        <div class="forms-section">
+            <div class="form-card">
+                <h3>🔺 Adicionar Receita</h3>
+                <form id="receitaForm">
+                    <div class="form-group">
+                        <label for="receitaDescricao">Descrição:</label>
+                        <input type="text" id="receitaDescricao" placeholder="Ex: Salário" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="receitaValor">Valor:</label>
+                        <input type="number" id="receitaValor" placeholder="0,00" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="receitaCategoria">Categoria:</label>
+                        <select id="receitaCategoria">
+                            <option value="Salário">Salário</option>
+                            <option value="Freelance">Freelance</option>
+                            <option value="Investimentos">Investimentos</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="receitaVencimento">Data de Vencimento:</label>
+                        <input type="date" id="receitaVencimento" required>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="receitaPago">
+                        <label for="receitaPago">Recebido</label>
+                    </div>
+                    <button type="submit" class="btn">Adicionar Receita</button>
+                </form>
+            </div>
+
+            <div class="form-card">
+                <h3>🔻 Adicionar Despesa</h3>
+                <form id="despesaForm">
+                    <div class="form-group">
+                        <label for="despesaDescricao">Descrição:</label>
+                        <input type="text" id="despesaDescricao" placeholder="Ex: Aluguel" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="despesaValor">Valor:</label>
+                        <input type="number" id="despesaValor" placeholder="0,00" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="despesaCategoria">Categoria:</label>
+                        <select id="despesaCategoria">
+                            <option value="Moradia">Moradia</option>
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Saúde">Saúde</option>
+                            <option value="Educação">Educação</option>
+                            <option value="Entretenimento">Entretenimento</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="despesaVencimento">Data de Vencimento:</label>
+                        <input type="date" id="despesaVencimento" required>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="despesaPago">
+                        <label for="despesaPago">Pago</label>
+                    </div>
+                    <button type="submit" class="btn">Adicionar Despesa</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="transactions">
+            <h3>📋 Transações do Mês</h3>
+            
+            <div class="filter-tabs">
+                <div class="filter-tab active" data-filter="todas">Todas</div>
+                <div class="filter-tab" data-filter="pagas">Pagas</div>
+                <div class="filter-tab" data-filter="pendentes">Pendentes</div>
+                <div class="filter-tab" data-filter="receitas">Receitas</div>
+                <div class="filter-tab" data-filter="despesas">Despesas</div>
+            </div>
+
+            <div id="transactionsList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Estrutura de dados para armazenar transações por mês
+        let financialData = {};
+        let currentMonth = new Date().getMonth();
+        let currentFilter = 'todas';
+
+        // Inicializar dados para todos os meses
+        for (let i = 0; i < 12; i++) {
+            financialData[i] = {
+                receitas: [],
+                despesas: []
+            };
+        }
+
+        // Definir o mês atual no seletor
+        document.getElementById('monthSelect').value = currentMonth;
+
+        // Event listeners
+        document.getElementById('monthSelect').addEventListener('change', function() {
+            currentMonth = parseInt(this.value);
+            updateDisplay();
+        });
+
+        document.getElementById('receitaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            addReceita();
+        });
+
+        document.getElementById('despesaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            addDespesa();
+        });
+
+        // Filter tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                updateTransactionsList();
+            });
+        });
+
+        function addReceita() {
+            const descricao = document.getElementById('receitaDescricao').value;
+            const valor = parseFloat(document.getElementById('receitaValor').value);
+            const categoria = document.getElementById('receitaCategoria').value;
+            const vencimento = document.getElementById('receitaVencimento').value;
+            const pago = document.getElementById('receitaPago').checked;
+
+            if (descricao && valor > 0 && vencimento) {
+                financialData[currentMonth].receitas.push({
+                    id: Date.now(),
+                    descricao,
+                    valor,
+                    categoria,
+                    vencimento,
+                    pago,
+                    dataPagamento: pago ? new Date().toLocaleDateString('pt-BR') : null
+                });
+
+                document.getElementById('receitaForm').reset();
+                updateDisplay();
+            }
+        }
+
+        function addDespesa() {
+            const descricao = document.getElementById('despesaDescricao').value;
+            const valor = parseFloat(document.getElementById('despesaValor').value);
+            const categoria = document.getElementById('despesaCategoria').value;
+            const vencimento = document.getElementById('despesaVencimento').value;
+            const pago = document.getElementById('despesaPago').checked;
+
+            if (descricao && valor > 0 && vencimento) {
+                financialData[currentMonth].despesas.push({
+                    id: Date.now(),
+                    descricao,
+                    valor,
+                    categoria,
+                    vencimento,
+                    pago,
+                    dataPagamento: pago ? new Date().toLocaleDateString('pt-BR') : null
+                });
+
+                document.getElementById('despesaForm').reset();
+                updateDisplay();
+            }
+        }
+
+        function togglePaymentStatus(type, id) {
+            const item = financialData[currentMonth][type].find(item => item.id === id);
+            if (item) {
+                item.pago = !item.pago;
+                item.dataPagamento = item.pago ? new Date().toLocaleDateString('pt-BR') : null;
+                updateDisplay();
+            }
+        }
+
+        function deleteTransaction(type, id) {
+            financialData[currentMonth][type] = financialData[currentMonth][type].filter(item => item.id !== id);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const monthData = financialData[currentMonth];
+            
+            // Calcular totais
+            const receitasPagas = monthData.receitas.filter(item => item.pago).reduce((sum, item) => sum + item.valor, 0);
+            const receitasPendentes = monthData.receitas.filter(item => !item.pago).reduce((sum, item) => sum + item.valor, 0);
+            const despesasPagas = monthData.despesas.filter(item => item.pago).reduce((sum, item) => sum + item.valor, 0);
+            const despesasPendentes = monthData.despesas.filter(item => !item.pago).reduce((sum, item) => sum + item.valor, 0);
+            
+            const totalPendentes = receitasPendentes + despesasPendentes;
+            const saldoReal = receitasPagas - despesasPagas;
+            const saldoPrevisto = (receitasPagas + receitasPendentes) - (despesasPagas + despesasPendentes);
+
+            // Atualizar resumo
+            document.getElementById('totalReceitasPagas').textContent = formatCurrency(receitasPagas);
+            document.getElementById('totalDespesasPagas').textContent = formatCurrency(despesasPagas);
+            document.getElementById('totalPendentes').textContent = formatCurrency(totalPendentes);
+            document.getElementById('saldoReal').textContent = formatCurrency(saldoReal);
+            document.getElementById('saldoPrevisto').textContent = formatCurrency(saldoPrevisto);
+
+            // Atualizar cores dos saldos
+            const saldoRealElement = document.getElementById('saldoReal');
+            const saldoPrevistoElement = document.getElementById('saldoPrevisto');
+            saldoRealElement.style.color = saldoReal >= 0 ? '#4caf50' : '#f44336';
+            saldoPrevistoElement.style.color = saldoPrevisto >= 0 ? '#4caf50' : '#f44336';
+
+            // Atualizar lista de transações
+            updateTransactionsList();
+        }
+
+        function updateTransactionsList() {
+            const transactionsList = document.getElementById('transactionsList');
+            const monthData = financialData[currentMonth];
+            
+            // Combinar todas as transações
+            let allTransactions = [
+                ...monthData.receitas.map(item => ({...item, type: 'receita'})),
+                ...monthData.despesas.map(item => ({...item, type: 'despesa'}))
+            ];
+
+            // Aplicar filtros
+            if (currentFilter === 'pagas') {
+                allTransactions = allTransactions.filter(t => t.pago);
+            } else if (currentFilter === 'pendentes') {
+                allTransactions = allTransactions.filter(t => !t.pago);
+            } else if (currentFilter === 'receitas') {
+                allTransactions = allTransactions.filter(t => t.type === 'receita');
+            } else if (currentFilter === 'despesas') {
+                allTransactions = allTransactions.filter(t => t.type === 'despesa');
+            }
+
+            // Ordenar por vencimento
+            allTransactions.sort((a, b) => new Date(a.vencimento) - new Date(b.vencimento));
+
+            let html = '';
+
+            if (allTransactions.length === 0) {
+                html = '<div class="empty-state">Nenhuma transação encontrada para este filtro</div>';
+            } else {
+                allTransactions.forEach(transaction => {
+                    const vencimento = new Date(transaction.vencimento).toLocaleDateString('pt-BR');
+                    const statusClass = transaction.pago ? 'pago' : 'pendente';
+                    const statusText = transaction.pago ? 'Pago' : 'Pendente';
+                    
+                    html += `
+                        <div class="transaction-item ${statusClass}">
+                            <div class="status-indicator ${statusClass}"></div>
+                            <div class="transaction-info">
+                                <div class="transaction-desc">${transaction.descricao}</div>
+                                <div class="transaction-details">
+                                    <span>📁 ${transaction.categoria}</span>
+                                    <span>📅 Venc: ${vencimento}</span>
+                                    ${transaction.dataPagamento ? `<span>✅ Pago em: ${transaction.dataPagamento}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="transaction-actions">
+                                <div class="transaction-value ${transaction.type}">
+                                    ${transaction.type === 'receita' ? '+' : '-'}${formatCurrency(transaction.valor)}
+                                </div>
+                                <button class="status-toggle ${statusClass}" onclick="togglePaymentStatus('${transaction.type === 'receita' ? 'receitas' : 'despesas'}', ${transaction.id})">
+                                    ${statusText}
+                                </button>
+                                <button class="delete-btn" onclick="deleteTransaction('${transaction.type === 'receita' ? 'receitas' : 'despesas'}', ${transaction.id})">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            transactionsList.innerHTML = html;
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        // Definir data padrão como hoje
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('receitaVencimento').value = today;
+        document.getElementById('despesaVencimento').value = today;
+
+        // Inicializar display
+        updateDisplay();
+    </script>
+</body>
+</html>
